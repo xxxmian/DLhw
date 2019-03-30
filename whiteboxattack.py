@@ -82,7 +82,7 @@ print("model is loaded")
 # frezzing part of grad
 for name, param in model.named_parameters():
     if param.requires_grad:
-        print(name)
+        #print(name)
         param.requires_grad = False
 
 test_dataset = torchvision.datasets.FashionMNIST(root='./data/',
@@ -90,11 +90,11 @@ test_dataset = torchvision.datasets.FashionMNIST(root='./data/',
                                             transform=transforms.ToTensor())
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           batch_size=1,
-                                          shuffle=False)
+                                          shuffle=True)
 
 criterion = nn.CrossEntropyLoss()
 criterion2 = nn.MSELoss()
-learning_rate = 0.005
+learning_rate = 0.001
 to_pil_image = transforms.ToPILImage()
 
 def printimg():
@@ -125,13 +125,13 @@ def addinterference():
             
     num_interrupted = 0
     attactedimg = []
-    time_bound = 10
-    for image, label in choosen[0:10]:
+    time_bound = 7
+    for image, label in choosen:
         # fix the label
         orimage = image[:]
         orlabel = label[:]
         label = label.to(device)  # change the original label to a new false one
-        label = (label.data + 6)%10
+        label = (label.data + 1)%10
         label = label.detach()
         
         time = 0
@@ -149,13 +149,12 @@ def addinterference():
                 orimage = orimage.cpu().squeeze(0)
                 img = to_pil_image(out_image[:])
                 img2 = to_pil_image(orimage[:])
-                print "save image"
+                # print "save image"
                 img = img.convert('RGB')
                 img2 = img2.convert('RGB')
-                print(img.mode)
-                img.save('./white_attack_picsave/attackedIMG%d.jpg'%(num_interrupted))
-                img2.save('./white_attack_picsave/originalIMG%d.jpg' %(num_interrupted))
-                
+                img.save('./white_attack_picsave/attackImg/attackedIMG%d.jpg'%(num_interrupted))
+                img2.save('./white_attack_picsave/originalImg/originalIMG%d.jpg' %(num_interrupted))
+              
                 break
             else:  # add interferrence
                 loss1 = criterion(output, label)
