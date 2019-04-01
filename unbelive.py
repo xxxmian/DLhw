@@ -9,10 +9,10 @@ from torch.autograd import Variable
 from network import ResNet, ResidualBlock
 
 from PIL import Image
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-
-model = torch.load('resnet.pkl')
+model = ResNet(ResidualBlock, [2, 2, 2]).to(device)
+model = model.load_state_dict(torch.load('resnet.pkl'))
 print("model is loaded")
 
 to_pil_image = transforms.ToPILImage()

@@ -17,7 +17,7 @@ transform = transforms.Compose([
     transforms.RandomCrop(32),
     transforms.ToTensor()])
 
-# CIFAR-10 dataset
+# FashionMNIST dataset
 train_dataset = torchvision.datasets.FashionMNIST(root='./data/',
                                              train=True,
                                              transform=transform,
@@ -167,4 +167,4 @@ with torch.no_grad():
  
 
 # Save the model checkpoint
-torch.save(model, 'resnet.pkl')
+torch.save(model.state_dict(), 'resnet.pkl')
