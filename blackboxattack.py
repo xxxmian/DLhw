@@ -9,8 +9,8 @@ import json
 from network import ResNet,ResidualBlock
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-model = ResNet(ResidualBlock, [2, 2, 2]).to(device)
-model = model.load_state_dict(torch.load('resnet.pkl'))
+
+model = torch.load('resnet.pkl')
 print("model is loaded")
 
 # load test data
@@ -41,7 +41,7 @@ def blackAttack():
     
     num_tointerrupted = 0
     toattactimg = []
-    time_bound = 7
+    time_bound = 40
     for image, label in  choosen:
         # fix the label
         orimage = image[:]
