@@ -6,12 +6,10 @@ import torchvision.transforms as transforms
 import numpy as np
 import matplotlib.pyplot as plt
 from torch.autograd import Variable
-from network import Resnet, ResidualBlock
+from network import ResNet, ResidualBlock
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-
-model = ResNet(ResidualBlock, [2, 2, 2]).to(device)
-model = model.load_state_dict(torch.load('resnet.pkl'))
+model =torch.load('resnet.pkl')
 print("model is loaded")
 
 # frezzing part of grad
@@ -99,8 +97,8 @@ def whiteAttack():
                 templabel = Variable(label.type(torch.cuda.FloatTensor))
                 loss2 = criterion2(predicted, templabel)
                 loss2.backward()
-                image_grad =image_grad + image.grad
+                image_grad =image_grad #+ image.grad
                 new_image = image - learning_rate*image_grad
                 image = new_image[:]
-    print(num_interrupted)
+    print('%d  pictures was attackted attacking rate :%d %%' % (num_interrupted,num_interrupted/10))
 whiteAttack()
