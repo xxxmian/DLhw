@@ -1,15 +1,10 @@
 import torch
-import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
-import numpy as np
-import matplotlib.pyplot as plt
 from torch.autograd import Variable
-import json
 from network import ResNet,ResidualBlock
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-
 model = torch.load('resnet.pkl')
 print("model is loaded")
 
@@ -42,6 +37,7 @@ def blackAttack():
     num_tointerrupted = 0
     toattactimg = []
     time_bound = 40
+    f=open('./adv_data.txt','w')
     for image, label in  choosen:
         # fix the label
         orimage = image[:]
@@ -73,8 +69,13 @@ def blackAttack():
             if dist>delta_dist:
                 continue
             if predict == label:
+                num_tointerrupted += 1
                 toattactimg.append((image_, label, orimage, orlabel))
-                num_tointerrupted+=1
+                path1='./black_attack_picsave/att/attimg%d.jpg' % (num_tointerrupted)
+                path2='./black_attack_picsave/ori/orimg%d.jpg' % (num_tointerrupted)
+                save_img(image_, path1,orimage,path2)
+                f.write(path1+' %d\n' % orlabel)
+                
                 break
             image = image_[:]
     print("%d images was attacktted" % num_tointerrupted)
@@ -85,20 +86,18 @@ def blackAttack():
         if predict==label:
             cnt.add(label.item())
     print cnt
-    save_img(toattactimg)
+    f.close()
     
-def save_img(img):
-    number = 0
-    for image, label, orimage,orlabel in img:
-        number += 1
-        image = image.cpu().squeeze(0)
-        img = to_pil_image(image[:])
-        img.convert('RGB')
-        img.save('./black_attack_picsave/att/attimg%d.jpg' %(number))
+def save_img(image,path1,orimage,path2):
+    
+    image = image.cpu().squeeze(0)
+    img = to_pil_image(image[:])
+    img.convert('RGB')
+    img.save(path1)
 
-        orimage = orimage.cpu().squeeze(0)
-        img = to_pil_image(orimage[:])
-        img.convert('RGB')
-        img.save('./black_attack_picsave/ori/orimg%d.jpg' % (number))
+    orimage = orimage.cpu().squeeze(0)
+    img = to_pil_image(orimage[:])
+    img.convert('RGB')
+    img.save(path2)
         
 blackAttack()
