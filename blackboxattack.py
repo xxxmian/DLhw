@@ -49,6 +49,7 @@ def blackAttack():
         image_var = torch.sum((image - img_mean) ** 2) / (image.shape[-1] * image.shape[-2])
         img_std = (torch.sqrt(image_var) / 8).expand_as(image)
         time = 0
+        pickedP=set()
         while time<time_bound:  # do until the image was classified to the new false one
             time+=1
             # add interference
@@ -73,31 +74,31 @@ def blackAttack():
                 toattactimg.append((image_, label, orimage, orlabel))
                 path1='./black_attack_picsave/att/attimg%d.jpg' % (num_tointerrupted)
                 path2='./black_attack_picsave/ori/orimg%d.jpg' % (num_tointerrupted)
-                save_img(image_, path1,orimage,path2)
+                save_img(image_, path1)
+                save_img(orimage,path2)
                 f.write(path1+' %d\n' % orlabel)
-                
+                if label not in pickedP:
+                    pickedP.add(label)
+                    tempath = './submit_b_p/attimg%d.jpg' %(label)
+                    save_img(image_,tempath)
                 break
             image = image_[:]
-    print("%d images was attacktted" % num_tointerrupted)
+    print("%d images was attacktted, Attack rate %.2f %%" % (num_tointerrupted,num_tointerrupted/10))
     cnt = set()
     for image, label,orimage,orlabel in toattactimg:
         output=model(image)
         predict = torch.argmax(output)
         if predict==label:
             cnt.add(label.item())
-    print cnt
+    #print len(cnt)
     f.close()
     
-def save_img(image,path1,orimage,path2):
+def save_img(image,path):
     
     image = image.cpu().squeeze(0)
     img = to_pil_image(image[:])
     img.convert('RGB')
-    img.save(path1)
+    img.save(path)
 
-    orimage = orimage.cpu().squeeze(0)
-    img = to_pil_image(orimage[:])
-    img.convert('RGB')
-    img.save(path2)
         
 blackAttack()

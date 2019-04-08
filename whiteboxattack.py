@@ -12,7 +12,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model =torch.load('resnet.pkl')
 print("model is loaded")
 
-# frezzing part of grad
+# freezing part of grad
 for name, param in model.named_parameters():
     if param.requires_grad:
         #print(name)
@@ -41,6 +41,7 @@ def printimg():
         if number == 10:
             break
 def whiteAttack():
+    f=open('adv_data_w.txt','w')
     choosen = []
     num_choosen = 0
     # choose 1000 correct classified images
@@ -58,7 +59,7 @@ def whiteAttack():
             
     num_interrupted = 0
     attactedimg = []
-    time_bound = 7
+    time_bound = 20
     for image, label in choosen:
         # fix the label
         orimage = image[:]
@@ -68,6 +69,7 @@ def whiteAttack():
         label = label.detach()
         
         time = 0
+        pickedP=set()
         while time<time_bound:  # do until the image was classified to the new false one
             time+=1
             image = Variable(image.to(device), requires_grad=True)
@@ -78,6 +80,7 @@ def whiteAttack():
                 num_interrupted += 1
                 attactedimg.append(((image,label),(orimage,orlabel)))
                 
+                
                 out_image = image.cpu().squeeze(0)
                 orimage = orimage.cpu().squeeze(0)
                 img = to_pil_image(out_image[:])
@@ -87,6 +90,10 @@ def whiteAttack():
                 img2 = img2.convert('RGB')
                 img.save('./white_attack_picsave/attackImg/attackedIMG%d.jpg'%(num_interrupted))
                 img2.save('./white_attack_picsave/originalImg/originalIMG%d.jpg' %(num_interrupted))
+                f.write('./white_attack_picsave/attackImg/attackedIMG%d.jpg'%(num_interrupted)+' %d\n' % orlabel)
+                if label not in pickedP:
+                    pickedP.add(label)
+                    img.save('./submit_w_p/Attimg%d.jpg'%(label))
               
                 break
             else:  # add interferrence
@@ -101,4 +108,5 @@ def whiteAttack():
                 new_image = image - learning_rate*image_grad
                 image = new_image[:]
     print('%d  pictures was attackted attacking rate :%d %%' % (num_interrupted,num_interrupted/10))
+    f.close()
 whiteAttack()
