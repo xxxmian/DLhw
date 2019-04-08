@@ -79,8 +79,10 @@ def blackAttack():
                 f.write(path1+' %d\n' % orlabel)
                 if label not in pickedP:
                     pickedP.add(label)
-                    tempath = './submit_b_p/attimg%d.jpg' %(label)
-                    save_img(image_,tempath)
+                    tempath1 = './submit_b_p/attimg%d.jpg' %(label)
+                    tempath2 = './submit_b_p/orimg%d.jpg' %(label)
+                    save_img(image_,tempath1)
+                    save_img(orimage,tempath2)
                 break
             image = image_[:]
     print("%d images was attacktted, Attack rate %.2f %%" % (num_tointerrupted,num_tointerrupted/10))

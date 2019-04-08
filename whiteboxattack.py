@@ -41,6 +41,7 @@ def printimg():
         if number == 10:
             break
 def whiteAttack():
+    model.eval()
     f=open('adv_data_w.txt','w')
     choosen = []
     num_choosen = 0
@@ -94,6 +95,7 @@ def whiteAttack():
                 if label not in pickedP:
                     pickedP.add(label)
                     img.save('./submit_w_p/Attimg%d.jpg'%(label))
+                    img2.save('./submit_w_p/orimg%d.jpg'%(label))
               
                 break
             else:  # add interferrence
